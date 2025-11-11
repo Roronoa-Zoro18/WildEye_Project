@@ -1,0 +1,1 @@
+"C:\VS code\WildEye_Project(EDI)\yolov8n.pt"
