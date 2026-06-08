@@ -1,0 +1,251 @@
+.monitor-container {
+  width: 100%;
+  height: calc(100vh - 80px);
+  background-color: #1a1a1a;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.monitor-layout {
+  display: flex;
+  height: 100%;
+  gap: 20px;
+}
+
+/* Video Section (70%) */
+.video-section {
+  flex: 7;
+  display: flex;
+  flex-direction: column;
+  background-color: #2a2a2a;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #3a3a3a;
+}
+
+.video-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background-color: #1f1f1f;
+  border-bottom: 1px solid #3a3a3a;
+}
+
+.video-header h2 {
+  margin: 0;
+  color: #e5e7eb;
+  font-size: 1.5rem;
+}
+
+.camera-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #9ca3af;
+}
+
+.status-indicator {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.status-indicator.connecting {
+  background-color: #f97316;
+  box-shadow: 0 0 8px #f97316;
+}
+
+.status-indicator.connected {
+  background-color: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+}
+
+.status-indicator.error, .status-indicator.disconnected {
+  background-color: #ef4444;
+  box-shadow: 0 0 8px #ef4444;
+}
+
+.video-player {
+  flex: 1;
+  position: relative;
+  background-color: #000;
+}
+
+.live-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.7) 100%);
+  pointer-events: none;
+}
+
+.overlay-info {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  justify-content: space-between;
+  color: white;
+  font-size: 0.9rem;
+}
+
+.location {
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+.time {
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+/* Alerts Section (30%) */
+.alerts-section {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+  background-color: #2a2a2a;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #3a3a3a;
+}
+
+.alerts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background-color: #1f1f1f;
+  border-bottom: 1px solid #3a3a3a;
+}
+
+.alerts-header h2 {
+  margin: 0;
+  color: #e5e7eb;
+  font-size: 1.5rem;
+}
+
+.alert-count {
+  background-color: #4ade80;
+  color: #1a1a1a;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.alerts-terminal {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  background-color: #1a1a1a;
+}
+
+.no-alerts {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #9ca3af;
+  text-align: center;
+  padding: 20px;
+}
+
+.alerts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.alert-card {
+  background-color: #2a2a2a;
+  border-radius: 8px;
+  padding: 15px;
+  border-left: 4px solid #4ade80;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 1px solid #3a3a3a;
+}
+
+.alert-card:hover {
+  transform: translateX(5px);
+  border-color: #4ade80;
+}
+
+.animated-entry {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.alert-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.alert-header h3 {
+  margin: 0;
+  color: #e5e7eb;
+  font-size: 1.2rem;
+}
+
+.status-badge {
+  font-size: 0.8rem;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.alert-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.alert-time {
+  margin: 0;
+  color: #9ca3af;
+  font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 960px) {
+  .monitor-layout {
+    flex-direction: column;
+  }
+  
+  .video-section, .alerts-section {
+    flex: none;
+  }
+  
+  .alerts-terminal {
+    max-height: 300px;
+  }
+}

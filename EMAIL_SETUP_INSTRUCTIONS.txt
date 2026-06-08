@@ -1,0 +1,38 @@
+EMAIL SETUP INSTRUCTIONS FOR WILDEYE SYSTEM
+
+The WildEye system now focuses exclusively on email notifications for forest officers. SMS functionality has been removed as per your request.
+
+To enable email notifications for forest officers, you need to configure proper email credentials in the .env file.
+
+1. OPEN THE .ENV FILE:
+   Navigate to: c:\VS code\WildEye_Project(EDI)\backend\.env
+
+2. REPLACE PLACEHOLDER VALUES:
+   Change these lines:
+   EMAIL_USER=your_email@gmail.com
+   EMAIL_PASS=your_app_password
+   
+   To your actual Gmail credentials:
+   EMAIL_USER=youremail@gmail.com
+   EMAIL_PASS=your_gmail_app_password
+
+3. GMAIL APP PASSWORD SETUP:
+   If using Gmail, you need to generate an App Password:
+   a. Go to https://myaccount.google.com/
+   b. Click on "Security" in the left sidebar
+   c. Enable "2-Step Verification" if not already enabled
+   d. Scroll down to "App passwords" (under "Signing in to Google")
+   e. Select "Mail" and your device
+   f. Copy the generated 16-character password
+   g. Use this as your EMAIL_PASS value (without spaces)
+
+4. ALTERNATIVE EMAIL SERVICES:
+   You can also use other email services by modifying the transporter configuration in server.js:
+   - For Outlook: service: 'outlook'
+   - For Yahoo: service: 'yahoo'
+   - For custom SMTP: Replace the service with host/port configuration
+
+5. RESTART THE BACKEND SERVER:
+   After updating the .env file, restart the backend server for changes to take effect.
+
+NOTE: The system will now only attempt to send email notifications. If email credentials are not provided, no notifications will be sent.
