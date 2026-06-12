@@ -159,6 +159,3 @@ python wildeye_test.py
 * **Field Officers**: Registered inside **Settings**. They do not need to register accounts or access the dashboard. The system automatically routes instant alerts to their registered email addresses.
 
 ---
-
-## 📄 License
-This project is licensed under the MIT License - see the LICENSE file for details.
