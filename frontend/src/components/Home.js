@@ -14,8 +14,10 @@ const Home = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
+        const token = localStorage.getItem('wildeye_token');
+        const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
         // Fetch animal sightings count
-        const sightingsResponse = await fetch('http://localhost:5000/api/sightings');
+        const sightingsResponse = await fetch('http://localhost:5000/api/sightings', { headers });
         if (sightingsResponse.ok) {
           const sightings = await sightingsResponse.json();
           const animalsDetected = sightings.length;

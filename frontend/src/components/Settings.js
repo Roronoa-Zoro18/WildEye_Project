@@ -18,7 +18,9 @@ const Settings = () => {
     const fetchOfficers = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:5000/api/officers');
+        const token = localStorage.getItem('wildeye_token');
+        const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+        const response = await fetch('http://localhost:5000/api/officers', { headers });
         if (!response.ok) {
           throw new Error('Failed to fetch forest officers');
         }
@@ -59,10 +61,12 @@ const Settings = () => {
 
     try {
       setLoading(true);
+      const token = localStorage.getItem('wildeye_token');
       const response = await fetch('http://localhost:5000/api/officers', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
         body: JSON.stringify(newOfficer),
       });
@@ -97,8 +101,10 @@ const Settings = () => {
 
     try {
       setLoading(true);
+      const token = localStorage.getItem('wildeye_token');
       const response = await fetch(`http://localhost:5000/api/officers/${id}`, {
         method: 'DELETE',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
       });
 
       if (!response.ok) {

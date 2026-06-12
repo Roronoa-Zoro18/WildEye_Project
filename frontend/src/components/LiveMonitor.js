@@ -110,18 +110,18 @@ const LiveMonitor = () => {
             </div>
           </div>
           <div className="video-player">
-            {videoError ? (
+            {videoError && (
               <div className="video-placeholder">
                 <p>Waiting for video stream...</p>
                 <p>Make sure the Python detection script is running</p>
               </div>
-            ) : (
-              <img 
-                ref={videoRef}
-                alt="Live camera feed"
-                className="live-video"
-              />
             )}
+            <img 
+              ref={videoRef}
+              alt="Live camera feed"
+              className="live-video"
+              style={{ display: videoError ? 'none' : 'block' }}
+            />
             <div className="video-overlay">
               <div className="overlay-info">
                 <span className="location">Serengeti National Park</span>

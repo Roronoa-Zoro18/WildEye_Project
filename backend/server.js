@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 require('dotenv').config();
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 // --- HTTP and Socket.io Imports ---
 const http = require('http');
@@ -82,6 +84,44 @@ const forestOfficerSchema = new mongoose.Schema({
 });
 const ForestOfficer = mongoose.model('ForestOfficer', forestOfficerSchema);
 
+// User Schema for Authentication
+const userSchema = new mongoose.Schema({
+    username: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
+});
+const User = mongoose.model('User', userSchema);
+
+const JWT_SECRET = process.env.JWT_SECRET || 'wildeye_super_secret_jwt_key_2026';
+
+// Middleware to authenticate JWT token
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1]; // Format: "Bearer TOKEN"
+    
+    if (!token) {
+        return res.status(401).json({ message: "Access Denied: No Token Provided" });
+    }
+    
+    jwt.verify(token, JWT_SECRET, (err, user) => {
+        if (err) {
+            return res.status(403).json({ message: "Invalid or Expired Token" });
+        }
+        req.user = user;
+        next();
+    });
+}
+
 // === Create HTTP Server and Socket.io Server ===
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
@@ -104,8 +144,82 @@ app.get('/', (req, res) => {
     res.send('Wildeye Backend is running and connected to DB!');
 });
 
+// === Authentication Routes ===
+app.post('/api/auth/register', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        
+        if (!username || !password) {
+            return res.status(400).json({ message: "Username and password are required" });
+        }
+        
+        // Check if user already exists
+        const existingUser = await User.findOne({ username: username.toLowerCase() });
+        if (existingUser) {
+            return res.status(400).json({ message: "Username is already taken" });
+        }
+        
+        // Hash the password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+        
+        // Save new user
+        const newUser = new User({
+            username: username.toLowerCase(),
+            password: hashedPassword
+        });
+        
+        const savedUser = await newUser.save();
+        console.log(`SUCCESS: User registered: ${savedUser.username}`);
+        
+        res.status(201).json({ message: "User registered successfully" });
+    } catch (error) {
+        console.error("Error registering user:", error);
+        res.status(500).json({ message: "Error registering user" });
+    }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        
+        if (!username || !password) {
+            return res.status(400).json({ message: "Username and password are required" });
+        }
+        
+        // Find user
+        const user = await User.findOne({ username: username.toLowerCase() });
+        if (!user) {
+            return res.status(400).json({ message: "Invalid credentials" });
+        }
+        
+        // Validate password
+        const validPassword = await bcrypt.compare(password, user.password);
+        if (!validPassword) {
+            return res.status(400).json({ message: "Invalid credentials" });
+        }
+        
+        // Create token
+        const token = jwt.sign(
+            { id: user._id, username: user.username },
+            JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+        
+        console.log(`SUCCESS: User logged in: ${user.username}`);
+        res.status(200).json({
+            message: "Logged in successfully",
+            token,
+            user: { id: user._id, username: user.username }
+        });
+    } catch (error) {
+        console.error("Error logging in user:", error);
+        res.status(500).json({ message: "Error logging in" });
+    }
+});
+
 // Route to get all sightings
-app.get('/api/sightings', async (req, res) => {
+app.get('/api/sightings', authenticateToken, async (req, res) => {
     try {
         const sightings = await Sighting.find().sort({ timestamp: -1 });
         res.status(200).json(sightings);
@@ -116,7 +230,7 @@ app.get('/api/sightings', async (req, res) => {
 });
 
 // Route to get all forest officers
-app.get('/api/officers', async (req, res) => {
+app.get('/api/officers', authenticateToken, async (req, res) => {
     try {
         const officers = await ForestOfficer.find().sort({ createdAt: -1 });
         res.status(200).json(officers);
@@ -127,7 +241,7 @@ app.get('/api/officers', async (req, res) => {
 });
 
 // Route to add a new forest officer
-app.post('/api/officers', async (req, res) => {
+app.post('/api/officers', authenticateToken, async (req, res) => {
     try {
         const { name, email, phone, enabled } = req.body;
         
@@ -158,7 +272,7 @@ app.post('/api/officers', async (req, res) => {
 });
 
 // Route to update a forest officer
-app.put('/api/officers/:id', async (req, res) => {
+app.put('/api/officers/:id', authenticateToken, async (req, res) => {
     try {
         const { id } = req.params;
         const { name, email, phone, enabled } = req.body;
@@ -185,7 +299,7 @@ app.put('/api/officers/:id', async (req, res) => {
 });
 
 // Route to delete a forest officer
-app.delete('/api/officers/:id', async (req, res) => {
+app.delete('/api/officers/:id', authenticateToken, async (req, res) => {
     try {
         const { id } = req.params;
         
@@ -342,7 +456,9 @@ app.get('/api/video-frame', (req, res) => {
         res.sendFile(framePath, (err) => {
             if (err) {
                 console.error("Error sending video frame:", err);
-                res.status(500).send('Error serving video frame');
+                if (!res.headersSent) {
+                    res.status(500).send('Error serving video frame');
+                }
             }
         });
     } else {

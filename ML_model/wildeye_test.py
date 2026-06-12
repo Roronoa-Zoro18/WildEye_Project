@@ -172,11 +172,15 @@ while True:
     
     # Save the annotated frame for web display
     try:
-        success = cv2.imwrite(frame_path, annotated)
+        temp_frame_path = os.path.join(frames_dir, "temp_frame.jpg")
+        success = cv2.imwrite(temp_frame_path, annotated)
         if success:
+            os.replace(temp_frame_path, frame_path)
             print(f"Frame saved to {frame_path}")
         else:
-            print(f"Failed to save frame to {frame_path}")
+            print(f"Failed to write image to {temp_frame_path}")
+    except PermissionError:
+        print("Warning: latest_frame.jpg is locked by another process. Skipping frame update.")
     except Exception as e:
         print(f"Error saving frame: {e}")
     

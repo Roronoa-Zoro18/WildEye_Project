@@ -14,8 +14,10 @@ const Reports = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
+        const token = localStorage.getItem('wildeye_token');
+        const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
         // Fetch sightings data from backend
-        const response = await fetch('http://localhost:5000/api/sightings');
+        const response = await fetch('http://localhost:5000/api/sightings', { headers });
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }
